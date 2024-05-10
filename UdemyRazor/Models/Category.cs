@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace UdemyWeb.Models
+namespace UdemyRazor.Models
 {
     public class Category
     {
