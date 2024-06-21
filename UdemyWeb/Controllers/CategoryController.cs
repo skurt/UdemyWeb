@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using UdemyWeb.Data;
-using UdemyWeb.Models;
+using UdemyWeb.DataAccess.Data;
+using UdemyWeb.Models.Models;
 
 namespace UdemyWeb.Controllers
 {

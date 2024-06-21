@@ -16,4 +16,9 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Udemy.DataAccess\UdemyWeb.DataAccess.csproj" />
+    <ProjectReference Include="..\Udemy.Models\UdemyWeb.Models.csproj" />
+  </ItemGroup>
+
 </Project>
