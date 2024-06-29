@@ -1,20 +1,21 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using UdemyWeb.DataAccess.Data;
+using UdemyWeb.DataAccess.Repositories;
 using UdemyWeb.Models.Models;
 
 namespace UdemyWeb.Controllers
 {
     public class CategoryController : Controller
     {
-        private readonly ApplicationDbContext _db;
-        public CategoryController(ApplicationDbContext db)
+        private readonly ICategoryRepository _categoryRepository;
+        public CategoryController(ICategoryRepository db)
         {
-            _db = db;
+            _categoryRepository = db;
         }
 
         public IActionResult Index()
         {
-            List<Category> objCategoryList = _db.Categories.ToList();
+            List<Category> objCategoryList = _categoryRepository.GetAll().ToList();
             return View(objCategoryList);
         }
 
@@ -33,7 +34,7 @@ namespace UdemyWeb.Controllers
             {
                 ModelState.AddModelError("", "Test is a forbidden category name");
             }
-            var categories = _db.Categories.Where(x => x.DisplayOrder == category.DisplayOrder);
+            var categories = _categoryRepository.GetMultiple(x => x.DisplayOrder == category.DisplayOrder);
             var count = categories.Count();
             if (count > 0)
             {
@@ -42,8 +43,8 @@ namespace UdemyWeb.Controllers
 
             if (ModelState.IsValid)
             {
-                _db.Categories.Add(category);
-                _db.SaveChanges();
+                _categoryRepository.Add(category);
+                _categoryRepository.Save();
                 TempData["success"] = "Category created sucessfully.";
                 return RedirectToAction("Index", "Category");
             }
@@ -58,9 +59,10 @@ namespace UdemyWeb.Controllers
             { 
                 return NotFound();
             }
-            Category? categoryFromDb = _db.Categories.Find(id);
-            Category? categoryFromDb1 = _db.Categories.FirstOrDefault(u=>u.Id==id);
-            Category? categoryFromDb2 = _db.Categories.Where(u=>u.Id==id).FirstOrDefault();
+
+            Category? categoryFromDb = _categoryRepository.GetOne(c => c.Id == id);
+            //Category? categoryFromDb1 = _categoryRepository.GetOne(u=>u.Id==id);
+            //Category? categoryFromDb2 = _categoryRepository.GetOne(u => u.Id == id);
             if (categoryFromDb == null)
             {
                 return NotFound();
@@ -72,8 +74,8 @@ namespace UdemyWeb.Controllers
         {
             if (ModelState.IsValid)
             {
-                _db.Categories.Update(category);
-                _db.SaveChanges();
+                _categoryRepository.Update(category);
+                _categoryRepository.Save();
                 TempData["success"] = "Category updated sucessfully.";
                 return RedirectToAction("Index", "Category");
             }
@@ -89,9 +91,9 @@ namespace UdemyWeb.Controllers
             {
                 return NotFound();
             }
-            Category? categoryFromDb = _db.Categories.Find(id);
-            Category? categoryFromDb1 = _db.Categories.FirstOrDefault(u => u.Id == id);
-            Category? categoryFromDb2 = _db.Categories.Where(u => u.Id == id).FirstOrDefault();
+            Category? categoryFromDb = _categoryRepository.GetOne(c => c.Id == id);
+            //Category? categoryFromDb1 = _categoryRepository.FirstOrDefault(u => u.Id == id);
+            //Category? categoryFromDb2 = _categoryRepository.Where(u => u.Id == id).FirstOrDefault();
             if (categoryFromDb == null)
             {
                 return NotFound();
@@ -101,13 +103,13 @@ namespace UdemyWeb.Controllers
         [HttpPost, ActionName("Delete")]
         public IActionResult DeletePOST(int? id)
         {
-            Category category = _db.Categories.Find(id);
+            Category category = _categoryRepository.GetOne(c => c.Id == id);
             if (category == null)
             {
                 return NotFound();
             }
-            _db.Categories.Remove(category);
-            _db.SaveChanges();
+            _categoryRepository.Delete(category);
+            _categoryRepository.Save();
             TempData["success"] = "Category " + category.Name + " deleted sucessfully!";
 
             return RedirectToAction("Index", "Category");
